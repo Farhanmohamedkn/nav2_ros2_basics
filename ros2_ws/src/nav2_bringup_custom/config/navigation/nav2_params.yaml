@@ -1,0 +1,136 @@
+amcl:
+  ros__parameters:
+    use_sim_time: true
+
+map_server:
+  ros__parameters:
+    use_sim_time: true
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: true
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: /odom
+
+planner_server:
+  ros__parameters:
+    use_sim_time: true
+    expected_planner_frequency: 5.0
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+
+controller_server:
+  ros__parameters:
+    use_sim_time: true
+    transform_tolerance: 0.5
+    controller_frequency: 20.0
+    controller_plugins: ["FollowPath"]
+
+    FollowPath:
+      plugin: "dwb_core::DWBLocalPlanner"
+      debug_trajectory_details: true
+      min_vel_x: 0.0
+      max_vel_x: 0.22
+      min_vel_theta: -2.84
+      max_vel_theta: 2.84
+      acc_lim_x: 2.5
+      acc_lim_theta: 3.2
+      decel_lim_x: -2.5
+      vx_samples: 20
+      vtheta_samples: 20
+      sim_time: 1.7
+
+      critics: [
+        "RotateToGoal",
+        "Oscillation",
+    
+        "GoalAlign",
+        "PathAlign",
+        "PathDist",
+        "GoalDist"
+      ]
+
+      RotateToGoal.scale: 32.0
+      GoalAlign.scale: 24.0
+      PathAlign.scale: 32.0
+      PathDist.scale: 32.0
+      GoalDist.scale: 24.0
+    
+
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: true
+
+waypoint_follower:
+  ros__parameters:
+    use_sim_time: true
+
+velocity_smoother:
+  ros__parameters:
+    use_sim_time: true
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      footprint: "[[0.10, 0.08], [0.10, -0.08], [-0.10, -0.08], [-0.10, 0.08]]"
+      footprint_padding: 0.0
+
+      transform_tolerance: 0.5
+      use_sim_time: true
+      global_frame: map
+      robot_base_frame: base_link
+      resolution: 0.05
+      plugin_names: ["static_layer", "obstacle_layer", "inflation_layer"]
+      plugin_types: ["nav2_costmap_2d::StaticLayer", "nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::InflationLayer"]
+      static_layer:
+        map_subscribe_transient_local: true
+      obstacle_layer:
+        observation_sources: scan
+        scan:
+          topic: /scan
+          min_range: 0.05
+          max_obstacle_height: 2.0
+          min_obstacle_height: 0.25
+          raytrace_range: 3.5
+          obstacle_range: 3.0
+          clearing: true
+          marking: true
+          data_type: "LaserScan"
+      inflation_layer:
+        enabled: true
+        inflation_radius: 0.30
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      footprint: "[[0.10, 0.08], [0.10, -0.08], [-0.10, -0.08], [-0.10, 0.08]]"
+      footprint_padding: 0.0
+      transform_tolerance: 0.5
+      use_sim_time: true
+      global_frame: odom
+      robot_base_frame: base_link
+      rolling_window: true
+      width: 3
+      height: 3
+      resolution: 0.05
+      plugin_names: ["obstacle_layer", "inflation_layer"]
+      plugin_types: ["nav2_costmap_2d::ObstacleLayer", "nav2_costmap_2d::InflationLayer"]
+      obstacle_layer:
+        enabled: true
+        observation_sources: scan
+        scan:
+          topic: /scan
+          min_range: 0.05 
+          max_obstacle_height: 2.0
+          min_obstacle_height: 0.25
+          raytrace_range: 3.5
+          obstacle_range: 3.0
+          clearing: true
+          marking: true
+          data_type: "LaserScan"
+      inflation_layer:
+        enabled: true
+        inflation_radius: 0.30

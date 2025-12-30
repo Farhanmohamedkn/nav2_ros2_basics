@@ -1,6 +1,9 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
 import os
 
 def generate_launch_description():
@@ -10,7 +13,7 @@ def generate_launch_description():
         executable='ekf_node',
         name='ekf_filter_node',
         output='screen',
-        parameters=[os.path.join(
+        parameters=[{'use_sim_time': True},os.path.join(
             get_package_share_directory('nav2_bringup_custom'),
             'config',
             'localization',
@@ -37,17 +40,11 @@ def generate_launch_description():
         name='amcl',
         output='screen',
         parameters=[{
-            'use_sim_time': True,
-            'yaml_filename': os.path.join(
-                get_package_share_directory('nav2_bringup_custom'),
-                'maps',
-                'map.yaml'
-            )
+            'use_sim_time': True
         }]
     )
    
-
-
+    
 
     return LaunchDescription([
         ekf_node,
